@@ -1,0 +1,52 @@
+    1  cd w205
+    2  ls
+    3  cd spark-with-kafka-and-hdfs
+    4  docker-compose ps
+    5  docker-compose down
+    6  cd ..
+    7  cd project-2-Elias326
+    8  ls
+    9  git branch
+   10  docker-compose ps
+   11  ls
+   12  git branch
+   13  docker-compose up -d
+   14  docker-compose ps
+   15  docker-compose logs kafka | grep -i started
+   16  docker-compose exec kafka kafka-topics --create --topic assessments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:32181
+   17  docker-compose exec mids bash -c “cat /w205/project-2-Elias326/assessment-attempts-20180128-121051-nested.json | jq ‘.[]’ -c | kafkacat -P -b kafka:29092 -t <topic_name> && echo ‘Uploaded JSON file.’”
+   18  docker-compose exec mids bash -c "cat /w205/project-2-Elias326/assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | kafkacat -P -b kafka:29092 -t assessments && echo 'Uploaded JSON file.'"
+   19  docker-compose exec mids bash -c "kafkacat -C -b Kafka:29092 -t assessments -o beginning -e" | wc -l
+   20  docker-compose down
+   21  git status
+   22  git branch
+   23  git add docker-compose.yml
+   24  git commit -m "updated docker file with cloudera, kafka, and spark services"
+   25  git push origin project-2
+   26  git status
+   27  git add Project-2.md
+   28  git commit -m "completed docker and loading data sections"
+   29  git push origin project-2
+   30  git status
+   31  docker-compose up -d
+   32  docker ps
+   33  docker-compose logs kafka | grep -i started
+   34  docker-compose exec mids bash -c "kafkacat -C -b Kafka:29092 -t assessments -o beginning -e" | wc -l
+   35  docker-compose exec kafka kafka-topics --create --topic assessments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:32181
+   36  docker-compose exec mids bash -c "cat /w205/project-2-Elias326/assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | kafkacat -P -b kafka:29092 -t assessments && echo 'Uploaded JSON file.'"
+   37  docker-compose exec mids bash -c "kafkacat -C -b Kafka:29092 -t assessments -o beginning -e" | wc -l
+   38  docker-compose exec spark pyspark
+   39  docker-compose exec spark pyspark
+   40  docker-compose down
+   41  docker-compose up -d
+   42  docker-compose exec kafka kafka-topics --create --topic assessments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:32181
+   43  docker-compose exec mids bash -c "cat /w205/project-2-Elias326/assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | kafkacat -P -b kafka:29092 -t assessments && echo 'Uploaded JSON file.'"
+   44  docker-compose exec mids bash -c "kafkacat -C -b Kafka:29092 -t assessments -o beginning -e" | wc -l
+   45  docker-compose exec spark pyspark
+   46  git status
+   47  git branch
+   48  git add Project-2.md
+   49  git commit -m "completed spark, queries, and hdfs sections"
+   50  git push origin project-2
+   51  docker-compose down
+   52  history > Elias326-history.txt

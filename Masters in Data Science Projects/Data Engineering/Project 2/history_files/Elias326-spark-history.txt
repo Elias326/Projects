@@ -1,0 +1,38 @@
+raw_assessments = spark \
+  .read \
+  .format("kafka") \
+  .option("kafka.bootstrap.servers", "kafka:29092") \
+  .option("subscribe","assessments") \
+  .option("startingOffsets", "earliest") \
+  .option("endingOffsets", "latest") \
+  .load() 
+
+raw_assessments.cache()
+
+raw_assessments.printSchema()
+
+raw_assessments.show()
+
+assessments = raw_assessments.select(raw_assessments.value.cast('string'))
+
+import json
+
+from pyspark.sql import Row
+
+extracted_assessments = assessments.rdd.map(lambda x: Row(**json.loads(x.value))).toDF()
+
+extracted_assessments.registerTempTable('assessments')
+
+assessments = spark.sql("select * from assessments")
+
+assessments.show()
+
+assessments = spark.sql("select started_at, user_exam_id, exam_name from assessments")
+
+assessments.show()
+
+spark.sql("select exam_name, count(exam_name) from assessments group by exam_name order by count(exam_name) desc limit 3").show()
+
+spark.sql("select exam_name, count(exam_name) from assessments where exam_name='Normal Forms and All That Jazz Master Class' group by exam_name").show()
+
+assessments.write.parquet("/tmp/assessments")

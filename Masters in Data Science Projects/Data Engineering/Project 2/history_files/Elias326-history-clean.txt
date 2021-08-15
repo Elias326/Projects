@@ -1,0 +1,74 @@
+cd w205
+
+git clone https://github.com/mids-w205-schioberg/project-2-Elias326.git
+
+cd project-2-Elias326
+
+git branch project-2
+
+git chekckout project-2
+
+git branch
+
+curl -L -o assessment-attempts-20180128-121051-nested.json https://goo.gl/ME6hjp`
+
+docker-compose up -d
+
+docker-compose ps
+
+docker-compose logs kafka | grep -i started
+
+cat assessment-attempts-20180128-121051-nested.json | jq '.[0]' -c
+
+cat assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | wc -l
+
+docker-compose exec mids bash -c "cat /w205/project-2-Elias326/assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | kafkacat -P -b kafka:29092 -t assessments && echo 'Uploaded JSON file.'"
+
+docker-compose exec mids bash -c "kafkacat -C -b Kafka:29092 -t assessments -o beginning -e" | wc -l
+
+docker-compose exec spark pyspark
+
+raw_assessments = spark \
+  .read \
+  .format("kafka") \
+  .option("kafka.bootstrap.servers", "kafka:29092") \
+  .option("subscribe","assessments") \
+  .option("startingOffsets", "earliest") \
+  .option("endingOffsets", "latest") \
+  .load() 
+
+raw_assessments.cache()
+
+raw_assessments.printSchema()
+
+raw_assessments.show()
+
+assessments = raw_assessments.select(raw_assessments.value.cast('string'))
+
+import json
+
+from pyspark.sql import Row
+
+extracted_assessments = assessments.rdd.map(lambda x: Row(**json.loads(x.value))).toDF()
+
+extracted_assessments.registerTempTable('assessments')
+
+assessments = spark.sql("select * from assessments")
+
+assessments.show()
+
+assessments = spark.sql("select started_at, user_exam_id, exam_name from assessments")
+
+assessments.show()
+
+spark.sql("select exam_name, count(exam_name) from assessments group by exam_name order by count(exam_name) desc limit 3").show()
+
+spark.sql("select exam_name, count(exam_name) from assessments where exam_name='Normal Forms and All That Jazz Master Class' group by exam_name").show()
+
+assessments.write.parquet("/tmp/assessments")
+
+docker-compose exec cloudera hadoop fs -ls /tmp/
+
+docker-compose exec cloudera hadoop fs -ls -h /tmp/assessments
+
+docker-compose down
